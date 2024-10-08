@@ -7,6 +7,7 @@ public class Spawner : MonoBehaviour
     [SerializeField] private Pool _pool;
     [SerializeField] private List<Vector3> _positions;
     [SerializeField] private float _spawnDelay = 1f;
+    [SerializeField] private Displayer _displayer;
 
     private float _minPositionX = -5f;
     private float _maxPositionX = 5f;
@@ -30,6 +31,7 @@ public class Spawner : MonoBehaviour
             yield return waitCube;
 
             _cube = _pool.GetCube();
+            _displayer.AllObjects++;
             _cube.gameObject.SetActive(true);
             _cube.transform.position = GetRandomPosition();
             _cube.CubeDisappeared += SpawnBomb;
@@ -39,6 +41,7 @@ public class Spawner : MonoBehaviour
     private void SpawnBomb(Cube cube)
     {
         Bomb bomb = _pool.GetBomb();
+        _displayer.AllObjects++;
         bomb.gameObject.SetActive(true);
         bomb.transform.position = cube.transform.position;
         cube.CubeDisappeared -= SpawnBomb;

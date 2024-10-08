@@ -5,8 +5,10 @@ public class ObjectPool<T> where T : MonoBehaviour
 {
     public T Prefab { get; }
     public Transform Countainer { get; }
+    public int NumberOfActiveObjects { get; private set; }
+    public int NumberOfCreatObjects { get; private set; }
 
-    private List<T> _pool;
+    private List<T> _pool;    
 
     public ObjectPool(T prefab, Transform countainer)
     {
@@ -19,11 +21,6 @@ public class ObjectPool<T> where T : MonoBehaviour
     private void CreatePool()
     {
         this._pool = new List<T>();
-
-        for (int i = 0; i < _pool.Count; i++)
-        {
-            this.CreatObject();
-        }
     }
 
     private T CreatObject(bool isActiveByDefault = false)
@@ -31,6 +28,7 @@ public class ObjectPool<T> where T : MonoBehaviour
         var createdObject = UnityEngine.Object.Instantiate(this.Prefab, this.Countainer);
         createdObject.gameObject.SetActive(isActiveByDefault);
         this._pool.Add(createdObject);
+        NumberOfCreatObjects++;
         return createdObject;
     }
 
@@ -56,5 +54,18 @@ public class ObjectPool<T> where T : MonoBehaviour
             return obj;
         
         return this.CreatObject(true);
+    }
+
+    public void CheckNumberOfActiveObjects()
+    {
+        NumberOfActiveObjects = 0;
+
+        foreach (var obj in _pool)
+        {
+            if (obj.gameObject.activeInHierarchy)
+            {
+                NumberOfActiveObjects++;
+            }
+        }
     }
 }
