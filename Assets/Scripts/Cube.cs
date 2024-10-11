@@ -6,7 +6,6 @@ using UnityEngine;
 public class Cube : MonoBehaviour, IPoolable<Cube>
 {
     private Painter _painter;
-    private Coroutine _coroutine;
 
     private bool _isTouched;
     private int _maxDelay = 4;
@@ -34,7 +33,7 @@ public class Cube : MonoBehaviour, IPoolable<Cube>
             {
                 _painter.SetRandomColor();
                 _isTouched = true;
-                _coroutine = StartCoroutine(DestroyObject());
+                StartCoroutine(DestroyObject());
             }
         }
     }
@@ -58,8 +57,6 @@ public class Cube : MonoBehaviour, IPoolable<Cube>
 
             yield return waitForSeconds;
         }
-
-        StopCoroutine(_coroutine);
     }
 
     private void GeneratLifeTime() => _lifetime = UnityEngine.Random.Range(_minDelay, _maxDelay);

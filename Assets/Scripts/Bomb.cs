@@ -12,7 +12,6 @@ public class Bomb : MonoBehaviour, IPoolable<Bomb>
 
     private Color _color;
     private SphereCollider _collider;
-    private Coroutine _coroutine;
 
     private float _maxAlpha = 1f;
     private float _minAlpha = 0f;
@@ -34,7 +33,7 @@ public class Bomb : MonoBehaviour, IPoolable<Bomb>
 
     public void Activate()
     {
-        _coroutine = StartCoroutine(StartDetonation());
+        StartCoroutine(StartDetonation());
     }
 
     private IEnumerator StartDetonation()
