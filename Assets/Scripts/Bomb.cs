@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bomb : MonoBehaviour
+public class Bomb : MonoBehaviour, IPoolable<Bomb>
 {
     [SerializeField] private float _explotionRadius;
     [SerializeField] private float _explotionForse;
@@ -16,6 +17,8 @@ public class Bomb : MonoBehaviour
     private float _maxAlpha = 1f;
     private float _minAlpha = 0f;
     private float _delta = 5f;
+
+    public event Action<Bomb> DisappearedObject;
 
     private void Awake()
     {
@@ -39,8 +42,7 @@ public class Bomb : MonoBehaviour
         yield return ChangeAlphaColor();
 
         Explode();
-        StopCoroutine(_coroutine);
-        gameObject.SetActive(false);
+        DisappearedObject?.Invoke(this);
     }
 
     private IEnumerator ChangeAlphaColor()
@@ -55,8 +57,6 @@ public class Bomb : MonoBehaviour
         }
     }
 
-    private void ChangeTrigger() => _collider.isTrigger = true;
-
     private void SetDefaultCharacteristics()
     {
         _color.a = _maxAlpha;
@@ -66,19 +66,19 @@ public class Bomb : MonoBehaviour
 
     private void Explode()
     {
-        foreach (Rigidbody obj in GetExplodebleObgect())
+        foreach (Rigidbody obj in GetExplodebleObjects())
             obj.AddExplosionForce(_explotionForse, transform.position, _explotionRadius);
     }
 
-    private List<Rigidbody> GetExplodebleObgect()
+    private List<Rigidbody> GetExplodebleObjects()
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, _explotionRadius);
-        List<Rigidbody> _obj = new();
+        List<Rigidbody> objects = new();
 
         foreach (Collider hit in hits)
             if (hit.attachedRigidbody != null && (hit.gameObject.TryGetComponent(out Cube _) || hit.gameObject.TryGetComponent(out Bomb _)))
-                _obj.Add(hit.attachedRigidbody);
+                objects.Add(hit.attachedRigidbody);
 
-        return _obj;
+        return objects;
     }
 }

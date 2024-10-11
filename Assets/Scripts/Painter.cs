@@ -6,12 +6,12 @@ public class Painter : MonoBehaviour
 
     private Renderer _renderer;
 
-    private void Start()
+    private void Awake()
     {
         _renderer = GetComponent<Renderer>();
     }
 
-    public void SetRandomColor() => _renderer.material.SetColor("_Color", Random.ColorHSV());
+    public void SetRandomColor() => _renderer.material.color = Random.ColorHSV();
 
-    public void SetDefaultColor() => _renderer.material.SetColor("_Color", _color);
+    public void SetDefaultColor() => _renderer.material.color = _color;
 }

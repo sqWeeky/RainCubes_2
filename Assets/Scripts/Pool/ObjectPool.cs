@@ -3,40 +3,25 @@ using UnityEngine;
 
 public class ObjectPool<T> where T : MonoBehaviour
 {
-    public T Prefab { get; }
-    public Transform Countainer { get; }
-    public int NumberOfActiveObjects { get; private set; }
-    public int NumberOfCreatObjects { get; private set; }
-
-    private List<T> _pool;    
+    private List<T> _pool;
+    private int _createObjectsCount = 0;
 
     public ObjectPool(T prefab, Transform countainer)
     {
-        this.Prefab = prefab;
-        this.Countainer = countainer;
-
-        this.CreatePool();
+        Prefab = prefab;
+        Countainer = countainer;
+        _pool = new List<T>();
     }
 
-    private void CreatePool()
-    {
-        this._pool = new List<T>();
-    }
+    public T Prefab { get; }
+    public Transform Countainer { get; }
+    public int CreateObjectsCount => _createObjectsCount;
 
-    private T CreatObject(bool isActiveByDefault = false)
-    {
-        var createdObject = UnityEngine.Object.Instantiate(this.Prefab, this.Countainer);
-        createdObject.gameObject.SetActive(isActiveByDefault);
-        this._pool.Add(createdObject);
-        NumberOfCreatObjects++;
-        return createdObject;
-    }
-
-    public bool HasFreeElement(out T element)
+    public bool TryGetElement(out T element)
     {
         foreach (var obj in _pool)
         {
-            if (!obj.gameObject.activeInHierarchy)
+            if (obj.gameObject.activeInHierarchy == false)
             {
                 element = obj;
                 obj.gameObject.SetActive(true);
@@ -50,22 +35,18 @@ public class ObjectPool<T> where T : MonoBehaviour
 
     public T GetFreeObject()
     {
-        if (this.HasFreeElement(out var obj))        
+        if (TryGetElement(out var obj))
             return obj;
-        
-        return this.CreatObject(true);
+
+        return CreatObject(true);
     }
 
-    public void CheckNumberOfActiveObjects()
+    private T CreatObject(bool isActiveByDefault = false)
     {
-        NumberOfActiveObjects = 0;
-
-        foreach (var obj in _pool)
-        {
-            if (obj.gameObject.activeInHierarchy)
-            {
-                NumberOfActiveObjects++;
-            }
-        }
+        var createdObject = UnityEngine.Object.Instantiate(Prefab, Countainer);
+        _createObjectsCount++;
+        createdObject.gameObject.SetActive(isActiveByDefault);
+        _pool.Add(createdObject);
+        return createdObject;
     }
 }

@@ -3,11 +3,9 @@ using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Painter))]
-public class Cube : MonoBehaviour
+public class Cube : MonoBehaviour, IPoolable<Cube>
 {
-    private Pool _pool;
     private Painter _painter;
-    private MeshRenderer _meshRenderer;
     private Coroutine _coroutine;
 
     private bool _isTouched;
@@ -15,11 +13,10 @@ public class Cube : MonoBehaviour
     private int _minDelay = 2;
     private int _lifetime;
 
-    public event Action<Cube> CubeDisappeared;
+    public event Action<Cube> DisappearedObject;
 
     private void Awake()
     {
-        _meshRenderer = GetComponent<MeshRenderer>();
         _painter = GetComponent<Painter>();
     }
 
@@ -53,9 +50,8 @@ public class Cube : MonoBehaviour
             if (_lifetime <= 0)
             {
                 _isTouched = false;
-                CubeDisappeared?.Invoke(this);
+                DisappearedObject?.Invoke(this);
                 _painter.SetDefaultColor();
-                gameObject.SetActive(false);
 
                 yield break;
             }
